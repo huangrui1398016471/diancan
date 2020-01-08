@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @MapperScan("com.lzyh.diancan")
 public class DiancanApplication {
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(DiancanApplication.class, args);
 	}
