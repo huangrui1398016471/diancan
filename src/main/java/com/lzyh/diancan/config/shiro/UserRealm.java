@@ -1,10 +1,12 @@
 package com.lzyh.diancan.config.shiro;
 
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.lzyh.diancan.config.shiro.jwt.JwtToken;
 import com.lzyh.diancan.dao.RoleDao;
 import com.lzyh.diancan.dao.UserDao;
 import com.lzyh.diancan.model.common.Constant;
+import com.lzyh.diancan.pojo.Role;
 import com.lzyh.diancan.pojo.User;
 import com.lzyh.diancan.utils.JedisUtil;
 import com.lzyh.diancan.utils.JwtUtil;
@@ -19,6 +21,9 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -57,24 +62,25 @@ public class UserRealm extends AuthorizingRealm {
         System.out.println("shiro:授权");
         String account = JwtUtil.getClaim(principalCollection.toString(), Constant.ACCOUNT);
         System.out.println("account:"+account);
-//        用户名
-//        User user = new User();
-//        user.setUserName(account);
-//        user = userDao.selectOne(user);
-//        System.out.println(user);
-        // 查询用户角色
-//        List<RoleDto> roleDtos = roleMapper.findRoleByUser(userDto);
-//        EntityWrapper<Role> roleMapper = new EntityWrapper<Role>();
-//        roleMapper.setEntity(roleDao.selectById(user.getRoleId()));
-//        List<Role> roleList = roleDao.selectList(roleMapper);
-//        System.out.println("role list:-----"+roleList.toString());
-//        for (Iterator<Role> iterator = roleList.iterator(); iterator.hasNext(); ) {
-//            Role next =  iterator.next();
-//             //添加角色
-//            simpleAuthorizationInfo.addRole(next.getRole());
-//            simpleAuthorizationInfo.addStringPermission("admin");
-//        }
-        System.out.println("角色："+simpleAuthorizationInfo);
+        //用户名
+        User user = new User();
+        user.setUserName(account);
+        user = userDao.selectOne(user);
+        System.out.println(user);
+        // 查询用户角色列表
+        EntityWrapper<Role> roleMapper = new EntityWrapper<Role>();
+        roleMapper.setEntity(roleDao.selectById(user.getRoleId()));
+        List<Role> roleList = roleDao.selectList(roleMapper);
+        System.out.println("role list:-----"+roleList.toString());
+
+        for (Iterator<Role> iterator = roleList.iterator(); iterator.hasNext(); ) {
+            Role next =  iterator.next();
+            //添加角色(roleName)
+            simpleAuthorizationInfo.addRole(next.getRoleName());
+//            添加权限
+            simpleAuthorizationInfo.addStringPermission("admin");
+        }
+//        System.out.println("角色："+simpleAuthorizationInfo);
 //        User selectOne = userDao1.selectOne(user);
 //        Role role = new Role();
 //        role.setId(selectOne.getRoleId());

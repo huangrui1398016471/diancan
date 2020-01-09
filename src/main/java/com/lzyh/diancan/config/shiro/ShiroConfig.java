@@ -90,6 +90,7 @@ public class ShiroConfig {
         // filterChainDefinitionMap.put("/api/**", "anon");
         // 登录接口放开
         filterChainDefinitionMap.put("/user/login", "anon");
+        filterChainDefinitionMap.put("/custom/weixinLogin", "anon");
         // 所有请求通过我们自己的JWTFilter
         filterChainDefinitionMap.put("/**", "jwt");
         factoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

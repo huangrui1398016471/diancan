@@ -25,24 +25,21 @@ public class UserUtil {
         this.userDao2 = userDao2;
     }
 
-    /**
-     * 获取当前登录用户
-     *
-     * @param
-     * @return com.wang.model.UserDto
-     * @author wliduo[i@dolyw.com]
-     * @date 2019/3/15 11:48
-     */
+/**
+ * 功能描述: <br>
+ * 〈获取当前登录用户〉
+ * @Param: []
+ * @Return: com.lzyh.diancan.pojo.User
+ * @Author: 13980
+ * @Date: 2020/1/9 10:54
+ */
+
     public User getUser() {
         String token = SecurityUtils.getSubject().getPrincipal().toString();
         // 解密获得Account
         String account = JwtUtil.getClaim(token, Constant.ACCOUNT);
-//        UserDto userDto = new UserDto();
         User user = new User();
-//        user.setUsername(account);
         user.setUserName(account);
-//        userDto.setAccount(account);
-//        userDto = userMapper.selectOne(userDto);
          User user3 = userDao2.selectOne(user);
         // 用户是否存在
         if (user3 == null) {
