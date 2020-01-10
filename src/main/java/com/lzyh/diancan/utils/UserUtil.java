@@ -1,9 +1,9 @@
 package com.lzyh.diancan.utils;
 
-import com.lzyh.diancan.dao.UserDao;
+import com.lzyh.diancan.dao.SysUserDao;
 import com.lzyh.diancan.exception.CustomException;
 import com.lzyh.diancan.model.common.Constant;
-import com.lzyh.diancan.pojo.User;
+import com.lzyh.diancan.pojo.SysUser;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,11 +18,11 @@ import org.springframework.stereotype.Component;
 public class UserUtil {
 
 
-    private UserDao userDao2;
+    private SysUserDao userDao;
 
     @Autowired
-    public UserUtil(UserDao userDao2) {
-        this.userDao2 = userDao2;
+    public UserUtil(SysUserDao userDao) {
+        this.userDao = userDao;
     }
 
 /**
@@ -34,13 +34,13 @@ public class UserUtil {
  * @Date: 2020/1/9 10:54
  */
 
-    public User getUser() {
+    public SysUser getUser() {
         String token = SecurityUtils.getSubject().getPrincipal().toString();
         // 解密获得Account
         String account = JwtUtil.getClaim(token, Constant.ACCOUNT);
-        User user = new User();
+        SysUser user = new SysUser();
         user.setUserName(account);
-         User user3 = userDao2.selectOne(user);
+        SysUser user3 = userDao.selectOne(user);
         // 用户是否存在
         if (user3 == null) {
             throw new CustomException("该帐号不存在(The account does not exist.)");

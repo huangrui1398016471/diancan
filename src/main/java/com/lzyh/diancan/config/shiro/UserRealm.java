@@ -3,11 +3,15 @@ package com.lzyh.diancan.config.shiro;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.lzyh.diancan.config.shiro.jwt.JwtToken;
-import com.lzyh.diancan.dao.RoleDao;
-import com.lzyh.diancan.dao.UserDao;
+
+import com.lzyh.diancan.dao.SysRoleDao;
+import com.lzyh.diancan.dao.SysUserDao;
+import com.lzyh.diancan.dao.SysUserRoleDao;
 import com.lzyh.diancan.model.common.Constant;
-import com.lzyh.diancan.pojo.Role;
-import com.lzyh.diancan.pojo.User;
+
+import com.lzyh.diancan.pojo.SysRole;
+import com.lzyh.diancan.pojo.SysUser;
+import com.lzyh.diancan.pojo.SysUserRole;
 import com.lzyh.diancan.utils.JedisUtil;
 import com.lzyh.diancan.utils.JwtUtil;
 import com.lzyh.diancan.utils.common.StringUtil;
@@ -22,6 +26,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,13 +38,15 @@ import java.util.List;
  */
 @Service
 public class UserRealm extends AuthorizingRealm {
-    private RoleDao roleDao;
-    private UserDao userDao;
+    private SysRoleDao roleDao;
+    private SysUserDao userDao;
+    private SysUserRoleDao userRoleDao;
 
     @Autowired
-    public UserRealm(UserDao userDao1, RoleDao roleDao1) {
+    public UserRealm(SysUserDao userDao1, SysRoleDao roleDao1,SysUserRoleDao userRoleDao) {
         this.userDao = userDao1;
         this.roleDao = roleDao1;
+        this.userRoleDao = userRoleDao;
     }
 
     /**
@@ -60,45 +67,45 @@ public class UserRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         System.out.println("shiro:授权");
-        String account = JwtUtil.getClaim(principalCollection.toString(), Constant.ACCOUNT);
-        System.out.println("account:"+account);
-        //用户名
-        User user = new User();
-        user.setUserName(account);
+        String userName = JwtUtil.getClaim(principalCollection.toString(), Constant.ACCOUNT);
+        /*
+         *1.根据userName查询userId
+         *2.根据userId查询roleId集合
+         *3.根据roleId集合查询role集合 添加角色
+         *4.根据roleId查询权限ID集合
+         *5.根据权限id集合查询权限
+         *6.添加权限
+         */
+        // 根据userName查询userId
+        SysUser user = new SysUser();
+        user.setUserName(userName);
         user = userDao.selectOne(user);
-        System.out.println(user);
-        // 查询用户角色列表
-        EntityWrapper<Role> roleMapper = new EntityWrapper<Role>();
-        roleMapper.setEntity(roleDao.selectById(user.getRoleId()));
-        List<Role> roleList = roleDao.selectList(roleMapper);
-        System.out.println("role list:-----"+roleList.toString());
-
-        for (Iterator<Role> iterator = roleList.iterator(); iterator.hasNext(); ) {
-            Role next =  iterator.next();
+        // 根据userId查询roleId集合
+        SysUserRole sysUserRole = new SysUserRole();
+        sysUserRole.setUserId(user.getId());
+        EntityWrapper<SysUserRole> userRoleMapper = new EntityWrapper<SysUserRole>();
+        userRoleMapper.setEntity(sysUserRole);
+        List<SysUserRole> roleList = userRoleDao.selectList(userRoleMapper);
+        System.out.println("----------"+roleList);
+        // roleId集合
+        List list =new  ArrayList();
+        if(roleList != null){
+            for (int i = 0; i < roleList.size(); i++) {
+                SysUserRole next = roleList.get(i);
+                list.add(next.getRoleId());
+            }
+        }
+        // 根据roleId集合查询role集合 加入鉴权器
+        List<SysRole> sysRoles = roleDao.selectBatchIds(list);
+        for (Iterator<SysRole> iterator = sysRoles.iterator(); iterator.hasNext(); ) {
+            SysRole next = iterator.next();
             //添加角色(roleName)
             simpleAuthorizationInfo.addRole(next.getRoleName());
-//            添加权限
+            //根据角色id查询权限id集合
+
+
             simpleAuthorizationInfo.addStringPermission("admin");
         }
-//        System.out.println("角色："+simpleAuthorizationInfo);
-//        User selectOne = userDao1.selectOne(user);
-//        Role role = new Role();
-//        role.setId(selectOne.getRoleId());
-//        List<Role> roles = roleDao1.selectById(role);
-//        for (RoleDto roleDto : roleDtos) {
-//            if (roleDto != null) {
-//                // 添加角色
-//                simpleAuthorizationInfo.addRole(roleDto.getName());
-//                // 根据用户角色查询权限
-//                List<PermissionDto> permissionDtos = permissionMapper.findPermissionByRole(roleDto);
-//                for (PermissionDto permissionDto : permissionDtos) {
-//                    if (permissionDto != null) {
-//                        // 添加权限
-//                        simpleAuthorizationInfo.addStringPermission(permissionDto.getPerCode());
-//                    }
-//                }
-//            }
-//        }
         return simpleAuthorizationInfo;
     }
 
@@ -118,15 +125,17 @@ public class UserRealm extends AuthorizingRealm {
             throw new AuthenticationException("Token中帐号为空(The account in Token is empty.)");
         }
         // 查询用户是否存在
-        User user = new User();
+        SysUser user = new SysUser();
         user.setUserName(account);
-        User user1 = userDao.selectOne(user);
+        SysUser user1 = userDao.selectOne(user);
         if (user1 == null) {
             throw new AuthenticationException("该帐号不存在(The account does not exist.)");
         }
+        System.out.println("---------------");
         // 开始认证，要AccessToken认证通过，且Redis中存在RefreshToken，且两个Token时间戳一致
         if (JwtUtil.verify(token) && JedisUtil.exists(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account)) {
             // 获取RefreshToken的时间戳
+            System.out.println("-------000");
             String currentTimeMillisRedis = JedisUtil.getObject(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account).toString();
             // 获取AccessToken时间戳，与RefreshToken的时间戳对比
             if (JwtUtil.getClaim(token, Constant.CURRENT_TIME_MILLIS).equals(currentTimeMillisRedis)) {

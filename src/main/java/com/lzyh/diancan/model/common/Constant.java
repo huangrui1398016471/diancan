@@ -61,4 +61,7 @@ public class Constant {
      */
     public static final Integer PASSWORD_MAX_LEN = 16;
 
+//    weixin默认登录密码
+    public static final String WEIXIN_PASSWORD = "ok";
+
 }

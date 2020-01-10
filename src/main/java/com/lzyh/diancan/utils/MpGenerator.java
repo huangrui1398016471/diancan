@@ -17,15 +17,14 @@ import java.util.*;
  */
 public class MpGenerator {
     //  数据库表名集合
-    private static String[] table = {"of_adv","of_auth","of_comment","of_cus_info","of_food","of_food_audit","of_food_specs","of_food_type"
-            ,"of_merchant_id","of_order","of_order_details","of_role","of_role_auth","of_score","of_user","of_user_feedback","of_user_role"};
+    private static String[] table = {"of_sys_auth"};
     //table名字
     private static String[] prefixs = {"of_"};            //table前缀
     private static String authorName = "huangrui";                //作者
     private static String parent = "com.lzyh.diancan";         //父包名
     /*获取虚拟机当前工作目录*/
     private static String path = System.getProperty("user.dir");  //获取项目
-    private static String url = "jdbc:mysql://localhost:3306/orderfood?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private static String url = "jdbc:mysql://www.taxori.com:3306/orderfood_test?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
     private static String username = "root";
     private static String password = "123456";
     private static String driverClassName = "com.mysql.jdbc.Driver";
