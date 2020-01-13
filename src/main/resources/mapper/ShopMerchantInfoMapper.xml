@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzyh.diancan.dao.ShopMerchantInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.lzyh.diancan.pojo.ShopMerchantInfo">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="merchant_name" property="merchantName" />
+        <result column="merchant_address" property="merchantAddress" />
+        <result column="longitude" property="longitude" />
+        <result column="latitude" property="latitude" />
+        <result column="is_delete" property="isDelete" />
+        <result column="lz_bank_card_num" property="lzBankCardNum" />
+        <result column="merchant_no" property="merchantNo" />
+        <result column="is_open" property="isOpen" />
+        <result column="leader_name" property="leaderName" />
+        <result column="id_card" property="idCard" />
+        <result column="telphone" property="telphone" />
+        <result column="score" property="score" />
+        <result column="comment_num" property="commentNum" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, merchant_name, merchant_address, longitude, latitude, is_delete, lz_bank_card_num, merchant_no, is_open, leader_name, id_card, telphone, score, comment_num, gmt_create, gmt_modified
+    </sql>
+
+</mapper>

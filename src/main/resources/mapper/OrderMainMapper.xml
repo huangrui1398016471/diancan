@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzyh.diancan.dao.OrderMainDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.lzyh.diancan.pojo.OrderMain">
+        <id column="id" property="id" />
+        <result column="order_id" property="orderId" />
+        <result column="merchant_id" property="merchantId" />
+        <result column="order_price" property="orderPrice" />
+        <result column="is_pay" property="isPay" />
+        <result column="customer_id" property="customerId" />
+        <result column="goods_num" property="goodsNum" />
+        <result column="people_num" property="peopleNum" />
+        <result column="pay_way" property="payWay" />
+        <result column="order_type" property="orderType" />
+        <result column="customer_remarks" property="customerRemarks" />
+        <result column="appointment_time" property="appointmentTime" />
+        <result column="customer_tel" property="customerTel" />
+        <result column="table_num" property="tableNum" />
+        <result column="meal_num" property="mealNum" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_id, merchant_id, order_price, is_pay, customer_id, goods_num, people_num, pay_way, order_type, customer_remarks, appointment_time, customer_tel, table_num, meal_num, gmt_create, gmt_modified
+    </sql>
+
+</mapper>
